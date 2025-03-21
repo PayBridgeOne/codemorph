@@ -1,5 +1,20 @@
 #include "codemorph.hpp"
 
+std::vector<std::byte> CodeMorph::test_hex_to_bytes(const std::string& value) {
+    const size_t bin_length = value.length() / 2;
+    std::vector<std::byte> packed_bytes(bin_length);
+    size_t index = 0;
+
+    for (size_t i = 0, j = index; i < bin_length; i++, j++) {
+        packed_bytes[j] = static_cast<std::byte>(
+            std::to_integer<uint8_t>(hex_lookup[static_cast<uint8_t>(value[i * 2])]) << 4 |
+            std::to_integer<uint8_t>(hex_lookup[static_cast<uint8_t>(value[i * 2 + 1])])
+        );
+    }
+
+    return packed_bytes;
+}
+
 void CodeMorph::int_to_bytes(int value, std::span<std::byte> &packedBytes, int &index, const int numHexDigits)
 {
     if (numHexDigits == 2)
@@ -112,22 +127,22 @@ int CodeMorph::bytes_to_int(const std::span<std::byte> &packedBytes, int &index,
     return result;
 }
 
-int CodeMorph::bcd_to_int(const std::span<std::byte>& packedBytes, int& index, const int numHexDigits)
-{
+int CodeMorph::bcd_to_int(std::span<const std::byte> packed_bytes, int& index, int num_hex_digits) {
     int result = 0;
-    const int len = numHexDigits / 2;
+    const int len = num_hex_digits / 2;
 
-    for (int i = 0; i < len; i++)
-    {
-        result = result * 100 + ((static_cast<int>(packedBytes[index + i]) >> 4) * 10) + (static_cast<int>(packedBytes[index + i]) & 0xf);
+    for (int i = 0; i < len; ++i) {
+        const auto byte = static_cast<int>(packed_bytes[index + i]);
+        const int high = (byte >> 4) & 0xF;
+        const int low = byte & 0xF;
+        result = result * 100 + high * 10 + low;
     }
 
     index += len;
-
     return result;
 }
 
-std::string CodeMorph::bcd_to_ascii(std::span<std::byte>& packedBytes, int& index, const FieldPadding padding, const int valueLength)
+std::string CodeMorph::bcd_to_ascii(std::span<const std::byte> packedBytes, int& index, const FieldPadding padding, const int valueLength)
     {
         std::string value(valueLength, '0');
 
@@ -169,7 +184,7 @@ std::string CodeMorph::bcd_to_ascii(std::span<std::byte>& packedBytes, int& inde
         return value;
     }
 
-std::string CodeMorph::bytes_to_ascii(std::span<std::byte>& packedBytes, int& index, const int numBytes)
+std::string CodeMorph::bytes_to_ascii(std::span<const std::byte> packedBytes, int& index, const int numBytes)
 {
     std::string result(numBytes, '0');
 
@@ -181,7 +196,7 @@ std::string CodeMorph::bytes_to_ascii(std::span<std::byte>& packedBytes, int& in
     return result;
 }
 
-std::string CodeMorph::bytes_to_hex(const std::span<std::byte>& packedBytes, int& index, const int numBytes) {
+std::string CodeMorph::bytes_to_hex(const std::span<const std::byte> packedBytes, int& index, const int numBytes) {
     std::string hexString;
     hexString.reserve(numBytes * 2);
 
@@ -193,7 +208,7 @@ std::string CodeMorph::bytes_to_hex(const std::span<std::byte>& packedBytes, int
     return hexString;
 }
 
-std::string CodeMorph::bytes_to_hex(const std::span<std::byte>& bytes, const int length) {
+std::string CodeMorph::bytes_to_hex(const std::span<const std::byte> bytes, const int length) {
     std::string hexString;
     hexString.reserve(length * 2);
 
@@ -204,7 +219,7 @@ std::string CodeMorph::bytes_to_hex(const std::span<std::byte>& bytes, const int
     return hexString;
 }
 
-std::string CodeMorph::ebcdic_to_ascii(std::span<std::byte>& packedBytes, int& index, const int numBytes)
+std::string CodeMorph::ebcdic_to_ascii(std::span<const std::byte> packedBytes, int& index, const int numBytes)
 {
     std::string result(numBytes, '0');
 

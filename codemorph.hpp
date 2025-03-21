@@ -9,6 +9,7 @@
 class CodeMorph {
 public:
        enum class FieldPadding { LEFT, RIGHT, NONE };
+       static std::vector<std::byte> test_hex_to_bytes(const std::string& value);
        static void int_to_bytes(int value, std::span<std::byte> &packedBytes, int &index, int numHexDigits);
        static void int_to_bcd(int value, std::span<std::byte> &packedBytes, int &index, int numBytes);
        static void ascii_to_bcd(const std::string &value, std::span<std::byte> &packedBytes, int &index, FieldPadding padding);
@@ -16,12 +17,12 @@ public:
        static void hex_to_bytes(const std::string &value, std::vector<std::byte> &packedBytes, size_t &index);
        static void ascii_to_ebcdic(const std::string &value, std::span<std::byte> &packedBytes, size_t &index);
        static int bytes_to_int(const std::span<std::byte> &packedBytes, int &index, int numHexDigits);
-       static int bcd_to_int(const std::span<std::byte>& packedBytes, int& index, int numHexDigits);
-       static std::string bcd_to_ascii(std::span<std::byte>& packedBytes, int& index, FieldPadding padding, int valueLength);
-       static std::string bytes_to_ascii(std::span<std::byte>& packedBytes, int& index, int numBytes);
-       static std::string bytes_to_hex(const std::span<std::byte>& packedBytes, int& index, int numBytes);
-       static std::string bytes_to_hex(const std::span<std::byte>& bytes, int length);
-       static std::string ebcdic_to_ascii(std::span<std::byte>& packedBytes, int& index, int numBytes);
+       static int bcd_to_int(std::span<const std::byte> packed_bytes, int& index, int num_hex_digits);
+       static std::string bcd_to_ascii(std::span<const std::byte> packedBytes, int& index, FieldPadding padding, int valueLength);
+       static std::string bytes_to_ascii(std::span<const std::byte> packedBytes, int& index, int numBytes);
+       static std::string bytes_to_hex(std::span<const std::byte> packedBytes, int& index, int numBytes);
+       static std::string bytes_to_hex(std::span<const std::byte> bytes, int length);
+       static std::string ebcdic_to_ascii(std::span<const std::byte> packedBytes, int& index, int numBytes);
 private:
        static constexpr  std::array<std::byte, 144> hex_lookup = {
            /* 00-0F */ std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0},

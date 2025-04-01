@@ -5,7 +5,7 @@
 #include "../codemorph.hpp"
 
 TEST_CASE("test_hex_to_bytes converts hex string to byte vector correctly", "[test_hex_to_bytes]") {
-    std::string hex_input = "4F20A1";
+    const std::string hex_input = "4F20A1";
     auto result = CodeMorph::test_hex_to_bytes(hex_input);
 
     REQUIRE(result.size() == 3);

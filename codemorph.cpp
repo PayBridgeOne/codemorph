@@ -1,5 +1,8 @@
 #include "codemorph.hpp"
 
+#include <cstdint>
+#include <bits/ranges_algobase.h>
+
 std::vector<std::byte> CodeMorph::test_hex_to_bytes(const std::string& value) {
     const size_t bin_length = value.length() / 2;
     std::vector<std::byte> packed_bytes(bin_length);
@@ -99,13 +102,13 @@ void CodeMorph::hex_to_bytes(const std::string& value, std::vector<std::byte>& p
     index += binLength;
 }
 
-void CodeMorph::ascii_to_ebcdic(const std::string &value, std::span<std::byte> &packedBytes, size_t &index)
+void CodeMorph::ascii_to_ebcdic(const std::string& value, std::span<std::byte> packed_bytes, size_t& index)
 {
     const auto srcLength = value.length();
 
     for (int i = 0; i < srcLength; i++)
     {
-        packedBytes[index + i] = ascii_to_ebcdic_table[static_cast<unsigned char>(value[i])];
+        packed_bytes[index + i] = ascii_to_ebcdic_table[static_cast<unsigned char>(value[i])];
     }
 
     index += srcLength;
@@ -219,7 +222,7 @@ std::string CodeMorph::bytes_to_hex(const std::span<const std::byte> bytes, cons
     return hexString;
 }
 
-std::string CodeMorph::ebcdic_to_ascii(std::span<const std::byte> packedBytes, int& index, const int numBytes)
+std::string CodeMorph::ebcdic_to_ascii(std::span<const std::byte> packedBytes, size_t& index, const int numBytes)
 {
     std::string result(numBytes, '0');
 

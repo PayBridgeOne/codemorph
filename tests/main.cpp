@@ -23,11 +23,11 @@ TEST_CASE("bytes_to_hex converts byte vector to hex string correctly", "[bytes_t
 
 TEST_CASE("int_to_bytes converts integer to byte vector correctly", "[int_to_bytes]") {
     constexpr int value = 12345;
-    auto result = CodeMorph::int_to_bytes(value, 4);
+    auto result = CodeMorph::int_to_bytes(value, 2);
 
     REQUIRE(result.size() == 2);
-    REQUIRE(result[0] == std::byte{0x30});
-    REQUIRE(result[1] == std::byte{0x39});
+    REQUIRE(result[0] == std::byte{0x39});
+    REQUIRE(result[1] == std::byte{0x30});
 }
 
 TEST_CASE("bytes_to_int converts byte vector to integer correctly", "[bytes_to_int]") {

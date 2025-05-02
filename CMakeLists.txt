@@ -12,6 +12,11 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/")
 
 add_library(CodeMorph STATIC codemorph.cpp)
 
+target_include_directories(CodeMorph
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 if(ENABLE_TESTING)
     include(CTest)
     enable_testing()

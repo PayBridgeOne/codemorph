@@ -57,27 +57,18 @@ auto CodeMorph::bytes_to_hex(const std::span<const std::byte> packed_bytes, int&
 
 void CodeMorph::int_to_bytes(const int value, std::span<std::byte> &packed_bytes, int &index,
                              const int num_hex_digits) {
-	if (num_hex_digits == 2) {
-		packed_bytes[index] = static_cast<std::byte>(value & 0xFF);
-		++index;
-	} else {
-		for (int i = 0; i < num_hex_digits; i++) {
-			packed_bytes[index + i] = static_cast<std::byte>(value >> i * 8 & 0xFF);
-		}
-		index += num_hex_digits;
+	for (int i = 0; i < num_hex_digits; i++) {
+		packed_bytes[index + i] = static_cast<std::byte>(value >> i * 8 & 0xFF);
 	}
+	index += num_hex_digits;
 }
 
 auto CodeMorph::int_to_bytes(const int value, const int num_hex_digits) -> std::vector<std::byte> {
 	std::vector<std::byte> result;
 
-	if (num_hex_digits == 2) {
-		result.emplace_back(static_cast<std::byte>(value & 0xFF));
-	} else {
-		result.resize(num_hex_digits);
-		for (int i = 0; i < num_hex_digits; i++) {
-			result[i] = static_cast<std::byte>(value >> i * 8 & 0xFF);
-		}
+	result.resize(num_hex_digits);
+	for (int i = 0; i < num_hex_digits; i++) {
+		result[i] = static_cast<std::byte>(value >> i * 8 & 0xFF);
 	}
 
 	return result;

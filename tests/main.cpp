@@ -22,7 +22,7 @@ TEST_CASE("bytes_to_hex converts byte vector to hex string correctly", "[bytes_t
 }
 
 TEST_CASE("int_to_bytes converts integer to byte vector correctly", "[int_to_bytes]") {
-    const int value = 12345;
+    constexpr int value = 12345;
     auto result = CodeMorph::int_to_bytes(value, 4);
 
     REQUIRE(result.size() == 2);

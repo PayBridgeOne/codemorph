@@ -1,6 +1,7 @@
 #include "codemorph.hpp"
 
 #include <cstdint>
+#include <stdexcept>
 #include <bits/ranges_algobase.h>
 
 auto CodeMorph::hex_to_bytes(const std::string& value) -> std::vector<std::byte> {
@@ -74,25 +75,41 @@ auto CodeMorph::int_to_bytes(const int value, const int num_hex_digits) -> std::
 	return result;
 }
 
-void CodeMorph::int_to_bcd(int value, std::span<std::byte> &packed_bytes, int &index, int numBytes) {
-	numBytes /= 2;
-	std::vector<std::byte> buffer(numBytes);
+void CodeMorph::int_to_bcd(unsigned value,
+                std::span<std::byte> dest,
+                size_t& index,
+                const size_t num_digits)
+{
+    const size_t bytes = (num_digits + 1) / 2;
+    if (index + bytes > dest.size()) {
+        throw std::out_of_range("int_to_bcd: not enough space in destination buffer");
+    }
 
-	for (int i = numBytes - 1; i >= 0; i--) {
-		const int digit = value % 100;
-		value /= 100;
-		buffer[i] = static_cast<std::byte>((digit / 10 * 16) + (digit % 10));
-	}
+    // Fill from right to left: pack two digits per byte.
+    for (size_t i = 0; i < bytes; ++i) {
+        const unsigned low  = value % 10u; value /= 10u;
+        unsigned high = 0u;
+        if (i * 2 + 1 < num_digits) {  // only write a high nibble if we still have a digit
+            high = value % 10u; value /= 10u;
+        }
+        dest[index + bytes - 1 - i] = static_cast<std::byte>(high << 4 | low);
+    }
 
-	std::ranges::copy(buffer, packed_bytes.begin() + index);
-	index += numBytes;
+    index += bytes;
 }
 
-auto CodeMorph::int_to_bcd(int value, int num_bytes) -> std::vector<std::byte> {
-	num_bytes /= 2;
-	std::vector<std::byte> result(num_bytes);
+inline void CodeMorph::int_to_bcd(unsigned value,
+								  std::vector<std::byte>& dest,
+								  size_t& index,
+								  size_t num_digits) {
+	int_to_bcd(value, std::span{dest}, index, num_digits);
+}
 
-	for (int i = num_bytes - 1; i >= 0; --i) {
+auto CodeMorph::int_to_bcd(int value, int num_digits) -> std::vector<std::byte> {
+	num_digits /= 2;
+	std::vector<std::byte> result(num_digits);
+
+	for (int i = num_digits - 1; i >= 0; --i) {
 		const int digit = value % 100;
 		value /= 100;
 		const int bcd = (digit / 10) << 4 | digit % 10;

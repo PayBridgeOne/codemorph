@@ -73,19 +73,28 @@ public:
     /**
      * Converts an integer to Binary-Coded Decimal (BCD) and stores it in a span.
      * @param value The integer to convert.
-     * @param packed_bytes The span to store the resulting BCD.
+     * @param dest The span to store the resulting BCD.
      * @param index The starting index in the span to store the BCD.
-     * @param numBytes The number of bytes to represent the BCD.
+     * @param num_digits The number of bytes to represent the BCD.
      */
-    static void int_to_bcd(int value, std::span<std::byte> &packed_bytes, int &index, int numBytes);
+    static void int_to_bcd(unsigned value, std::span<std::byte> dest, size_t& index, size_t num_digits);
+
+    /**
+     * Converts an integer to Binary-Coded Decimal (BCD) and stores it in a span.
+     * @param value The integer to convert.
+     * @param dest The span to store the resulting BCD.
+     * @param index The starting index in the span to store the BCD.
+     * @param num_digits The number of bytes to represent the BCD.
+     */
+    static void int_to_bcd(unsigned value, std::vector<std::byte>& dest, size_t& index, size_t num_digits);
 
     /**
      * Converts an integer to a vector of Binary-Coded Decimal (BCD).
      * @param value The integer to convert.
-     * @param num_bytes The number of bytes to represent the BCD.
+     * @param num_digits The number of bytes to represent the BCD.
      * @return A vector of bytes representing the BCD.
      */
-    static auto int_to_bcd(int value, int num_bytes) -> std::vector<std::byte>;
+    static auto int_to_bcd(int value, int num_digits) -> std::vector<std::byte>;
 
     /**
      * Converts an ASCII string to Binary-Coded Decimal (BCD) and stores it in a span.

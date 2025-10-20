@@ -89,3 +89,4 @@ CMakeUserPresets.json
 
 # External projects
 *-prefix/
+/cmake-build-debug/

@@ -1,7 +1,0 @@
-# ninja log v6
-2	94	7613887996903982	CMakeFiles/CodeMorph.dir/codemorph.cpp.obj.ddi	182ca9c242b483de
-94	144	7613887998275458	CMakeFiles/CodeMorph.dir/CXX.dd	6c0cd39a9285ba3
-873	913	7613888005613169	CodeMorph.lib	2be80fd3d731a758
-94	144	7613887998275458	C:/Users/greye/CLionProjects/CodeMorph/cmake-build-debug/CMakeFiles/CodeMorph.dir/CXXModules.json	6c0cd39a9285ba3
-94	144	7613887998275458	CMakeFiles/CodeMorph.dir/codemorph.cpp.obj.modmap	6c0cd39a9285ba3
-150	873	7613887998385449	CMakeFiles/CodeMorph.dir/codemorph.cpp.obj	c24fa8f73e186a35

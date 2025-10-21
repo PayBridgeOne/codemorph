@@ -77,7 +77,7 @@ public:
      * @param index The starting index in the span to store the BCD.
      * @param num_digits The number of bytes to represent the BCD.
      */
-    static void int_to_bcd(unsigned value, std::vector<std::byte>& dest, size_t& index, size_t num_digits);
+    // static void int_to_bcd(unsigned value, std::span<std::byte> &dest, size_t& index, size_t num_digits);
 
     /**
      * Converts an integer to a vector of Binary-Coded Decimal (BCD).

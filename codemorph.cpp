@@ -123,8 +123,7 @@ auto CodeMorph::ascii_to_bcd(const std::string &value, const FieldPadding paddin
 	const bool need_padding = value_length % 2 != 0;
 
 	const size_t bcd_length = (value_length + 1) / 2;
-	std::vector<std::byte> result;
-	result.reserve(bcd_length);
+	std::vector<std::byte> result(bcd_length);
 
 	size_t start_index = 0;
 
@@ -189,7 +188,7 @@ auto CodeMorph::ascii_to_ebcdic(const std::string& value) -> std::vector<std::by
 
 	for (unsigned int i = 0; i < src_length; i++)
 	{
-		result[i] = ascii_to_ebcdic_table[static_cast<unsigned char>(value[i])];
+		result.emplace_back(ascii_to_ebcdic_table[static_cast<unsigned char>(value[i])]);
 	}
 
 	return result;

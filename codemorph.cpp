@@ -75,36 +75,6 @@ auto CodeMorph::int_to_bytes(const int value, const int num_hex_digits) -> std::
 	return result;
 }
 
-void CodeMorph::int_to_bcd(unsigned value,
-                std::span<std::byte> dest,
-                size_t& index,
-                const size_t num_digits)
-{
-    const size_t bytes = (num_digits + 1) / 2;
-    if (index + bytes > dest.size()) {
-        throw std::out_of_range("int_to_bcd: not enough space in destination buffer");
-    }
-
-    // Fill from right to left: pack two digits per byte.
-    for (size_t i = 0; i < bytes; ++i) {
-        const unsigned low  = value % 10u; value /= 10u;
-        unsigned high = 0u;
-        if (i * 2 + 1 < num_digits) {  // only write a high nibble if we still have a digit
-            high = value % 10u; value /= 10u;
-        }
-        dest[index + bytes - 1 - i] = static_cast<std::byte>(high << 4 | low);
-    }
-
-    index += bytes;
-}
-
-inline void CodeMorph::int_to_bcd(unsigned value,
-								  std::vector<std::byte>& dest,
-								  size_t& index,
-								  size_t num_digits) {
-	int_to_bcd(value, std::span{dest}, index, num_digits);
-}
-
 auto CodeMorph::int_to_bcd(int value, int num_digits) -> std::vector<std::byte> {
 	num_digits /= 2;
 	std::vector<std::byte> result(num_digits);

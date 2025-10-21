@@ -87,10 +87,12 @@ _deps
 ### CMake Patch ###
 CMakeUserPresets.json
 
-# External projects
-*-prefix/
-/cmake-build-debug/
-
 # JetBrains / CLion
 .idea/
 *.iml
+
+# External projects
+*-prefix/
+/cmake-build-debug/
+/build/
+/cmake-build-release/

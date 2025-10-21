@@ -90,3 +90,7 @@ CMakeUserPresets.json
 # External projects
 *-prefix/
 /cmake-build-debug/
+
+# JetBrains / CLion
+.idea/
+*.iml

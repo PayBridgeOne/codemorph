@@ -96,3 +96,4 @@ CMakeUserPresets.json
 /cmake-build-debug/
 /build/
 /cmake-build-release/
+/cmake-build-relwithdebinfo/

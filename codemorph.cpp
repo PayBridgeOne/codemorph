@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <bits/ranges_algobase.h>
 
 auto CodeMorph::hex_to_bytes(const std::string& value) -> std::vector<std::byte> {
 	const size_t bin_length = value.length() / 2;
@@ -34,14 +33,22 @@ void CodeMorph::hex_to_bytes(const std::string& value, std::vector<std::byte>& p
 }
 
 auto CodeMorph::bytes_to_hex(const std::span<const std::byte> bytes) -> std::string {
-	std::string hex_string;
-	hex_string.reserve(bytes.size() * 2);
+	static constexpr std::array kHexDigits{
+		'0', '1', '2', '3', '4', '5', '6', '7',
+		'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+	};
 
-	for (const std::byte b : bytes) {
-		hex_string.append(hex_string_lookup[std::to_integer<uint8_t>(b)]);
+	const std::size_t n = bytes.size();
+	std::string out(n * 2, '\0');  // preallocate full size
+	char* dst = out.data();
+
+	for (std::size_t i = 0; i < n; ++i) {
+		const auto v = std::to_integer<unsigned>(bytes[i]);
+		dst[2 * i]     = kHexDigits[(v >> 4) & 0x0F];
+		dst[2 * i + 1] = kHexDigits[v & 0x0F];
 	}
 
-	return hex_string;
+	return out;
 }
 
 auto CodeMorph::bytes_to_hex(const std::span<const std::byte> packed_bytes, int& index, const int num_bytes) -> std::string {

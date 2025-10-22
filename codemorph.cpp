@@ -39,7 +39,7 @@ auto CodeMorph::bytes_to_hex(const std::span<const std::byte> bytes) -> std::str
 	};
 
 	const std::size_t n = bytes.size();
-	std::string out(n * 2, '\0');  // preallocate full size
+	std::string out(n * 2, '\0');
 	char* dst = out.data();
 
 	for (std::size_t i = 0; i < n; ++i) {

@@ -15,7 +15,7 @@ TEST_CASE("hex_to_bytes converts hex string to byte vector correctly", "[hex_to_
 }
 
 TEST_CASE("bytes_to_hex converts byte vector to hex string correctly", "[bytes_to_hex]") {
-    std::vector<std::byte> bytes = {std::byte{0x4F}, std::byte{0x20}, std::byte{0xA1}};
+    std::vector bytes = {std::byte{0x4F}, std::byte{0x20}, std::byte{0xA1}};
     auto result = CodeMorph::bytes_to_hex(bytes);
 
     REQUIRE(result == "4F20A1");
@@ -31,7 +31,7 @@ TEST_CASE("int_to_bytes converts integer to byte vector correctly", "[int_to_byt
 }
 
 TEST_CASE("bytes_to_int converts byte vector to integer correctly", "[bytes_to_int]") {
-    std::vector<std::byte> bytes = {std::byte{0x30}, std::byte{0x39}};
+    std::vector bytes = {std::byte{0x30}, std::byte{0x39}};
     const auto result = CodeMorph::bytes_to_int(bytes, 4);
 
     REQUIRE(result == 12345);
@@ -47,7 +47,7 @@ TEST_CASE("ascii_to_bcd converts ASCII string to BCD correctly", "[ascii_to_bcd]
 }
 
 TEST_CASE("bcd_to_ascii converts BCD to ASCII string correctly", "[bcd_to_ascii]") {
-    std::vector<std::byte> bcd = {std::byte{0x12}, std::byte{0x34}};
+    std::vector bcd = {std::byte{0x12}, std::byte{0x34}};
     auto result = CodeMorph::bcd_to_ascii(bcd, CodeMorph::FieldPadding::NONE, 4);
 
     REQUIRE(result == "1234");
@@ -67,24 +67,24 @@ TEST_CASE("ascii_to_ebcdic and ebcdic_to_ascii roundtrip", "[ascii_to_ebcdic][eb
 }
 
 TEST_CASE("bcd_to_int with index converts BCD to integer correctly", "[bcd_to_int]") {
-    std::vector<std::byte> bcd = {std::byte{0x12}, std::byte{0x34}};
-    int index = 0;
-    int result = CodeMorph::bcd_to_int(bcd, index, 4);
+    std::vector bcd = {std::byte{0x12}, std::byte{0x34}};
+    size_t index = 0;
+    int32_t result = CodeMorph::bcd_to_int(bcd, index, 4);
 
     REQUIRE(result == 1234);
     REQUIRE(index == 2);
 }
 
 TEST_CASE("bcd_to_int without index converts BCD to integer correctly", "[bcd_to_int]") {
-    std::vector<std::byte> bcd = {std::byte{0x12}, std::byte{0x34}};
+    std::vector bcd = {std::byte{0x12}, std::byte{0x34}};
     int result = CodeMorph::bcd_to_int(bcd, 4);
 
     REQUIRE(result == 1234);
 }
 
 TEST_CASE("bcd_to_ascii with index converts BCD to ASCII correctly", "[bcd_to_ascii]") {
-    std::vector<std::byte> bcd = {std::byte{0x12}, std::byte{0x34}};
-    int index = 0;
+    std::vector bcd = {std::byte{0x12}, std::byte{0x34}};
+    size_t index = 0;
     std::string result = CodeMorph::bcd_to_ascii(bcd, index, CodeMorph::FieldPadding::NONE, 4);
 
     REQUIRE(result == "1234");
@@ -92,15 +92,15 @@ TEST_CASE("bcd_to_ascii with index converts BCD to ASCII correctly", "[bcd_to_as
 }
 
 TEST_CASE("bcd_to_ascii without index converts BCD to ASCII correctly", "[bcd_to_ascii]") {
-    std::vector<std::byte> bcd = {std::byte{0x12}, std::byte{0x34}};
+    std::vector bcd = {std::byte{0x12}, std::byte{0x34}};
     std::string result = CodeMorph::bcd_to_ascii(bcd, CodeMorph::FieldPadding::NONE, 4);
 
     REQUIRE(result == "1234");
 }
 
 TEST_CASE("bytes_to_ascii with index converts bytes to ASCII correctly", "[bytes_to_ascii]") {
-    std::vector<std::byte> bytes = {std::byte{'A'}, std::byte{'B'}};
-    int index = 0;
+    std::vector bytes = {std::byte{'A'}, std::byte{'B'}};
+    size_t index = 0;
     std::string result = CodeMorph::bytes_to_ascii(bytes, index, 2);
 
     REQUIRE(result == "AB");
@@ -108,14 +108,14 @@ TEST_CASE("bytes_to_ascii with index converts bytes to ASCII correctly", "[bytes
 }
 
 TEST_CASE("bytes_to_ascii without index converts bytes to ASCII correctly", "[bytes_to_ascii]") {
-    std::vector<std::byte> bytes = {std::byte{'A'}, std::byte{'B'}};
+    std::vector bytes = {std::byte{'A'}, std::byte{'B'}};
     std::string result = CodeMorph::bytes_to_ascii(bytes, 2);
 
     REQUIRE(result == "AB");
 }
 
 TEST_CASE("ebcdic_to_ascii with index converts EBCDIC to ASCII correctly", "[ebcdic_to_ascii]") {
-    std::vector<std::byte> ebcdic = {std::byte{0xC1}, std::byte{0xC2}}; // EBCDIC for "AB"
+    std::vector ebcdic = {std::byte{0xC1}, std::byte{0xC2}}; // EBCDIC for "AB"
     size_t index = 0;
     std::string result = CodeMorph::ebcdic_to_ascii(ebcdic, index, 2);
 
@@ -124,7 +124,7 @@ TEST_CASE("ebcdic_to_ascii with index converts EBCDIC to ASCII correctly", "[ebc
 }
 
 TEST_CASE("ebcdic_to_ascii without index converts EBCDIC to ASCII correctly", "[ebcdic_to_ascii]") {
-    std::vector<std::byte> ebcdic = {std::byte{0xC1}, std::byte{0xC2}}; // EBCDIC for "AB"
+    std::vector ebcdic = {std::byte{0xC1}, std::byte{0xC2}}; // EBCDIC for "AB"
     std::string result = CodeMorph::ebcdic_to_ascii(ebcdic, 2);
 
     REQUIRE(result == "AB");

@@ -23,206 +23,241 @@ public:
     enum class FieldPadding { LEFT, RIGHT, NONE };
 
     /**
-    * Converts a hexadecimal string to a vector of bytes.
-    * @param value The hexadecimal string to convert.
-    * @return A vector of bytes representing the hexadecimal string.
-    */
-    static auto hex_to_bytes(const std::string &value) -> std::vector<std::byte>;
+     * Converts a hexadecimal string to a vector of bytes.
+     * @param value The hexadecimal string to convert.
+     * @return A vector of bytes representing the hexadecimal string.
+     */
+    [[nodiscard]] static auto hex_to_bytes(std::string_view value) -> std::vector<std::byte>;
 
     /**
-    * Converts a hexadecimal string to bytes and appends them to a vector.
-    * @param value The hexadecimal string to convert.
-    * @param packed_bytes The vector to store the resulting bytes.
-    * @param index The starting index in the vector to store the bytes.
-    */
-    static void hex_to_bytes(const std::string &value, std::vector<std::byte> &packed_bytes, size_t &index);
+     * Converts a hexadecimal string to bytes and writes them into a destination buffer.
+     * @param value The hexadecimal string to convert.
+     * @param packed_bytes The destination span to store the resulting bytes.
+     * @param index The current write offset in the destination span. It will be advanced.
+     */
+    static void hex_to_bytes(std::string_view value,
+                             std::span<std::byte> packed_bytes,
+                             std::size_t& index);
 
     /**
      * Converts a span of bytes to a hexadecimal string.
      * @param bytes The span of bytes to convert.
      * @return A string representing the bytes in hexadecimal format.
      */
-    static auto bytes_to_hex(std::span<const std::byte> bytes) -> std::string;
+    [[nodiscard]] static auto bytes_to_hex(std::span<const std::byte> bytes) -> std::string;
 
     /**
-     * Converts a span of bytes to a hexadecimal string starting from a specific index.
-     * @param packed_bytes The span of bytes to convert.
-     * @param index The starting index in the span.
+     * Converts a section of a span of bytes to a hexadecimal string.
+     * @param packed_bytes The source span of bytes to convert.
+     * @param index The current read offset in the span. It will be advanced.
      * @param num_bytes The number of bytes to convert.
      * @return A string representing the bytes in hexadecimal format.
      */
-    static auto bytes_to_hex(std::span<const std::byte> packed_bytes, int &index, int num_bytes) -> std::string;
+    [[nodiscard]] static auto bytes_to_hex(std::span<const std::byte> packed_bytes,
+                             std::size_t& index,
+                             std::size_t num_bytes) -> std::string;
 
     /**
-     * Converts an integer to bytes and stores them in a span.
+     * Converts an integer to bytes (binary/hex digit packing) and stores them in a destination buffer.
      * @param value The integer to convert.
-     * @param packed_bytes The span to store the resulting bytes.
-     * @param index The starting index in the span to store the bytes.
-     * @param num_hex_digits The number of hexadecimal digits to represent the integer.
+     * @param packed_bytes The destination span to store the resulting bytes.
+     * @param index The current write offset in the destination span. It will be advanced.
+     * @param byte_width The number of hexadecimal digits of `value` to encode.
      */
-    static void int_to_bytes(int value, std::span<std::byte> &packed_bytes, int &index, int num_hex_digits);
+    static void int_to_bytes(int32_t value,
+                             std::span<std::byte> packed_bytes,
+                             std::size_t& index,
+                             std::size_t byte_width);
 
     /**
      * Converts an integer to a vector of bytes.
      * @param value The integer to convert.
-     * @param num_hex_digits The number of hexadecimal digits to represent the integer.
+     * @param byte_width The number of hexadecimal digits of `value` to encode.
      * @return A vector of bytes representing the integer.
      */
-    static auto int_to_bytes(int value, int num_hex_digits) -> std::vector<std::byte>;
+    [[nodiscard]] static auto int_to_bytes(int32_t value,
+                             std::size_t byte_width) -> std::vector<std::byte>;
 
     /**
-     * Converts an integer to Binary-Coded Decimal (BCD) and stores it in a span.
+     * Converts an integer to Binary-Coded Decimal (BCD) and stores it in a destination buffer.
      * @param value The integer to convert.
-     * @param dest The span to store the resulting BCD.
-     * @param index The starting index in the span to store the BCD.
-     * @param num_digits The number of bytes to represent the BCD.
+     * @param packed_bytes The destination span to store the resulting BCD.
+     * @param index The current write offset in the destination span. It will be advanced.
+     * @param digit_count The number of decimal digits to encode as BCD.
      */
-    // static void int_to_bcd(unsigned value, std::span<std::byte> &dest, size_t& index, size_t num_digits);
+    static void int_to_bcd(int32_t value,
+                           std::span<std::byte> packed_bytes,
+                           std::size_t& index,
+                           std::size_t digit_count);
 
     /**
      * Converts an integer to a vector of Binary-Coded Decimal (BCD).
      * @param value The integer to convert.
-     * @param num_digits The number of bytes to represent the BCD.
+     * @param digit_count The number of decimal digits to encode as BCD.
      * @return A vector of bytes representing the BCD.
      */
-    static auto int_to_bcd(int value, int num_digits) -> std::vector<std::byte>;
+    [[nodiscard]] static auto int_to_bcd(int32_t value,
+                           std::size_t digit_count) -> std::vector<std::byte>;
 
     /**
-     * Converts an ASCII string to Binary-Coded Decimal (BCD) and stores it in a span.
+     * Converts an ASCII string of decimal digits to Binary-Coded Decimal (BCD)
+     * and writes it into a destination buffer.
      * @param value The ASCII string to convert.
-     * @param packed_bytes The span to store the resulting BCD.
-     * @param index The starting index in the span to store the BCD.
-     * @param padding The padding to apply (LEFT, RIGHT, or NONE).
+     * @param packed_bytes The destination span to store the resulting BCD.
+     * @param index The current write offset in the destination span. It will be advanced.
+     * @param padding The padding to apply (LEFT, RIGHT, or NONE) when the length is odd.
      */
-    static void ascii_to_bcd(const std::string &value, std::span<std::byte> &packed_bytes, int &index,
+    static void ascii_to_bcd(std::string_view value,
+                             std::span<std::byte> packed_bytes,
+                             std::size_t& index,
                              FieldPadding padding);
 
     /**
-     * Converts an ASCII string to a vector of Binary-Coded Decimal (BCD).
+     * Converts an ASCII string of decimal digits to Binary-Coded Decimal (BCD).
      * @param value The ASCII string to convert.
-     * @param padding The padding to apply (LEFT, RIGHT, or NONE).
+     * @param padding The padding to apply (LEFT, RIGHT, or NONE) when the length is odd.
      * @return A vector of bytes representing the BCD.
      */
-    static auto ascii_to_bcd(const std::string &value, FieldPadding padding) -> std::vector<std::byte>;
+    [[nodiscard]] static auto ascii_to_bcd(std::string_view value,
+                             FieldPadding padding) -> std::vector<std::byte>;
 
     /**
-     * Converts an ASCII string to bytes and stores them in a span.
+     * Converts an ASCII string to raw bytes and writes them into a destination buffer.
      * @param str_ascii_string The ASCII string to convert.
-     * @param packed_bytes The span to store the resulting bytes.
-     * @param index The starting index in the span to store the bytes.
+     * @param packed_bytes The destination span to store the resulting bytes.
+     * @param index The current write offset in the destination span. It will be advanced.
      */
-    static void ascii_to_bytes(const std::string &str_ascii_string, std::span<std::byte> &packed_bytes, size_t &index);
+    static void ascii_to_bytes(std::string_view str_ascii_string,
+                               std::span<std::byte> packed_bytes,
+                               std::size_t& index);
 
     /**
-     * Converts an ASCII string to a vector of bytes.
+     * Converts an ASCII string to a vector of raw bytes.
      * @param str_ascii_string The ASCII string to convert.
      * @return A vector of bytes representing the ASCII string.
      */
-    static auto ascii_to_bytes(const std::string &str_ascii_string) -> std::vector<std::byte>;
+    [[nodiscard]] static auto ascii_to_bytes(std::string_view str_ascii_string) -> std::vector<std::byte>;
 
     /**
-     * Converts an ASCII string to EBCDIC and stores it in a span.
+     * Converts an ASCII string to EBCDIC bytes and writes them into a destination buffer.
      * @param value The ASCII string to convert.
-     * @param packed_bytes The span to store the resulting EBCDIC.
-     * @param index The starting index in the span to store the EBCDIC.
+     * @param packed_bytes The destination span to store the resulting EBCDIC bytes.
+     * @param index The current write offset in the destination span. It will be advanced.
      */
-    static void ascii_to_ebcdic(const std::string &value, std::span<std::byte> packed_bytes, size_t &index);
+    static void ascii_to_ebcdic(std::string_view value,
+                                std::span<std::byte> packed_bytes,
+                                std::size_t& index);
 
     /**
      * Converts an ASCII string to a vector of EBCDIC bytes.
      * @param value The ASCII string to convert.
-     * @return A vector of bytes representing the EBCDIC.
+     * @return A vector of bytes representing the EBCDIC encoding.
      */
-    static auto ascii_to_ebcdic(const std::string &value) -> std::vector<std::byte>;
+    [[nodiscard]] static auto ascii_to_ebcdic(std::string_view value) -> std::vector<std::byte>;
 
     /**
-     * Converts a span of bytes to an integer starting from a specific index.
-     * @param packed_bytes The span of bytes to convert.
-     * @param index The starting index in the span.
-     * @param num_hex_digits The number of hexadecimal digits to represent the integer.
+     * Converts bytes to an integer starting from a specific offset.
+     * @param packed_bytes The source span of bytes to read.
+     * @param index The current read offset in the span. It will be advanced.
+     * @param byte_width The number of hexadecimal digits to read/interpret.
      * @return The integer represented by the bytes.
      */
-    static auto bytes_to_int(std::span<const std::byte> packed_bytes, int &index, int num_hex_digits) -> int;
+    [[nodiscard]] static auto bytes_to_int(std::span<const std::byte> packed_bytes,
+                             std::size_t& index,
+                             std::size_t byte_width) -> int32_t;
 
     /**
-    * Converts a span of bytes to an integer.
-    * @param packed_bytes The span of bytes to convert.
-    * @param num_hex_digits The number of hexadecimal digits to represent the integer.
-    * @return The integer represented by the bytes.
-    */
-    static auto bytes_to_int(std::span<const std::byte> packed_bytes, int num_hex_digits) -> int;
+     * Converts bytes to an integer.
+     * @param packed_bytes The source span of bytes to read.
+     * @param byte_width The number of hexadecimal digits to read/interpret.
+     * @return The integer represented by the bytes.
+     */
+    [[nodiscard]] static auto bytes_to_int(std::span<const std::byte> packed_bytes,
+                             std::size_t byte_width) -> int32_t;
 
-   /**
-    * Converts Binary-Coded Decimal (BCD) to an integer starting from a specific index.
-    * @param packed_bytes The span of BCD bytes to convert.
-    * @param index The starting index in the span.
-    * @param num_hex_digits The number of hexadecimal digits to represent the integer.
-    * @return The integer represented by the BCD.
-    */
-    static auto bcd_to_int(std::span<const std::byte> packed_bytes, int &index, int num_hex_digits) -> int;
+    /**
+     * Converts BCD bytes to an integer starting from a specific offset.
+     * @param packed_bytes The source span of BCD bytes to read.
+     * @param index The current read offset in the span. It will be advanced.
+     * @param digit_count The number of decimal digits encoded in BCD to read.
+     * @return The decoded integer value.
+     */
+    [[nodiscard]] static auto bcd_to_int(std::span<const std::byte> packed_bytes,
+                           std::size_t& index,
+                           std::size_t digit_count) -> int32_t;
 
-   /**
-    * Converts Binary-Coded Decimal (BCD) to an integer.
-    * @param packed_bytes The span of BCD bytes to convert.
-    * @param num_hex_digits The number of hexadecimal digits to represent the integer.
-    * @return The integer represented by the BCD.
-    */
-    static auto bcd_to_int(std::span<const std::byte> packed_bytes, int num_hex_digits) -> int;
+    /**
+     * Converts BCD bytes to an integer.
+     * @param packed_bytes The source span of BCD bytes to read.
+     * @param digit_count The number of decimal digits encoded in BCD to read.
+     * @return The decoded integer value.
+     */
+    [[nodiscard]] static auto bcd_to_int(std::span<const std::byte> packed_bytes,
+                           std::size_t digit_count) -> int32_t;
 
-   /**
-    * Converts Binary-Coded Decimal (BCD) to an ASCII string starting from a specific index.
-    * @param packed_bytes The span of BCD bytes to convert.
-    * @param index The starting index in the span.
-    * @param padding The padding to apply (LEFT, RIGHT, or NONE).
-    * @param value_length The length of the resulting ASCII string.
-    * @return The ASCII string represented by the BCD.
-    */
-    static auto bcd_to_ascii(std::span<const std::byte> packed_bytes, int &index, FieldPadding padding,
-                             int value_length) -> std::string;
+    /**
+     * Converts BCD bytes to an ASCII string starting from a specific offset.
+     * @param packed_bytes The source span of BCD bytes to read.
+     * @param index The current read offset in the span. It will be advanced.
+     * @param padding The padding that was originally applied (LEFT, RIGHT, or NONE).
+     * @param digit_count The number of ASCII characters expected in the output.
+     * @return The ASCII string represented by the BCD.
+     */
+    [[nodiscard]] static auto bcd_to_ascii(std::span<const std::byte> packed_bytes,
+                             std::size_t& index,
+                             FieldPadding padding,
+                             std::size_t digit_count) -> std::string;
 
-   /**
-    * Converts Binary-Coded Decimal (BCD) to an ASCII string.
-    * @param packed_bytes The span of BCD bytes to convert.
-    * @param padding The padding to apply (LEFT, RIGHT, or NONE).
-    * @param value_length The length of the resulting ASCII string.
-    * @return The ASCII string represented by the BCD.
-    */
-    static auto bcd_to_ascii(std::span<const std::byte> packed_bytes, FieldPadding padding,
-                             int value_length) -> std::string;
+    /**
+     * Converts BCD bytes to an ASCII string.
+     * @param packed_bytes The source span of BCD bytes to read.
+     * @param padding The padding that was originally applied (LEFT, RIGHT, or NONE).
+     * @param digit_count The number of ASCII characters expected in the output.
+     * @return The ASCII string represented by the BCD.
+     */
+    [[nodiscard]] static auto bcd_to_ascii(std::span<const std::byte> packed_bytes,
+                             FieldPadding padding,
+                             std::size_t digit_count) -> std::string;
 
-   /**
-    * Converts a span of bytes to an ASCII string starting from a specific index.
-    * @param packed_bytes The span of bytes to convert.
-    * @param index The starting index in the span.
-    * @param num_bytes The number of bytes to convert.
-    * @return The ASCII string represented by the bytes.
-    */
-    static auto bytes_to_ascii(std::span<const std::byte> packed_bytes, int &index, int num_bytes) -> std::string;
+    /**
+     * Converts raw bytes to an ASCII string starting from a specific offset.
+     * @param packed_bytes The source span of bytes to read.
+     * @param index The current read offset in the span. It will be advanced.
+     * @param byte_count The number of bytes to read.
+     * @return The ASCII string represented by those bytes.
+     */
+    [[nodiscard]] static auto bytes_to_ascii(std::span<const std::byte> packed_bytes,
+                               std::size_t& index,
+                               std::size_t byte_count) -> std::string;
 
-   /**
-    * Converts a span of bytes to an ASCII string.
-    * @param packed_bytes The span of bytes to convert.
-    * @param num_bytes The number of bytes to convert.
-    * @return The ASCII string represented by the bytes.
-    */
-    static auto bytes_to_ascii(std::span<const std::byte> packed_bytes, int num_bytes) -> std::string;
+    /**
+     * Converts raw bytes to an ASCII string.
+     * @param packed_bytes The source span of bytes to read.
+     * @param byte_count The number of bytes to read.
+     * @return The ASCII string represented by those bytes.
+     */
+    [[nodiscard]] static auto bytes_to_ascii(std::span<const std::byte> packed_bytes,
+                               std::size_t byte_count) -> std::string;
 
-   /**
-    * Converts EBCDIC to an ASCII string starting from a specific index.
-    * @param packed_bytes The span of EBCDIC bytes to convert.
-    * @param index The starting index in the span.
-    * @param num_bytes The number of bytes to convert.
-    * @return The ASCII string represented by the EBCDIC bytes.
-    */
-    static auto ebcdic_to_ascii(std::span<const std::byte> packed_bytes, size_t &index, int num_bytes) -> std::string;
+    /**
+     * Converts EBCDIC bytes to an ASCII string starting from a specific offset.
+     * @param packed_bytes The source span of EBCDIC bytes to read.
+     * @param index The current read offset in the span. It will be advanced.
+     * @param byte_count The number of bytes to read.
+     * @return The ASCII string represented by those EBCDIC bytes.
+     */
+    [[nodiscard]] static auto ebcdic_to_ascii(std::span<const std::byte> packed_bytes,
+                                std::size_t& index,
+                                std::size_t byte_count) -> std::string;
 
-   /**
-    * Converts EBCDIC to an ASCII string.
-    * @param packed_bytes The span of EBCDIC bytes to convert.
-    * @param num_bytes The number of bytes to convert.
-    * @return The ASCII string represented by the EBCDIC bytes.
-   */
-    static auto ebcdic_to_ascii(std::span<const std::byte> packed_bytes, int num_bytes) -> std::string;
+    /**
+     * Converts EBCDIC bytes to an ASCII string.
+     * @param packed_bytes The source span of EBCDIC bytes to read.
+     * @param byte_count The number of bytes to read.
+     * @return The ASCII string represented by those EBCDIC bytes.
+     */
+    [[nodiscard]] static auto ebcdic_to_ascii(std::span<const std::byte> packed_bytes,
+                                std::size_t byte_count) -> std::string;
 
 private:
     static constexpr std::array<std::byte, 256> hex_lookup = {
@@ -291,24 +326,7 @@ private:
         std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0},
         std::byte{0}
     };
-    static constexpr std::array<std::string, 256> hex_string_lookup = {
-        "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F",
-        "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F",
-        "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F",
-        "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D", "3E", "3F",
-        "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4A", "4B", "4C", "4D", "4E", "4F",
-        "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5A", "5B", "5C", "5D", "5E", "5F",
-        "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6A", "6B", "6C", "6D", "6E", "6F",
-        "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7A", "7B", "7C", "7D", "7E", "7F",
-        "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8A", "8B", "8C", "8D", "8E", "8F",
-        "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "9A", "9B", "9C", "9D", "9E", "9F",
-        "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "AA", "AB", "AC", "AD", "AE", "AF",
-        "B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "BA", "BB", "BC", "BD", "BE", "BF",
-        "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CA", "CB", "CC", "CD", "CE", "CF",
-        "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DA", "DB", "DC", "DD", "DE", "DF",
-        "E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "EA", "EB", "EC", "ED", "EE", "EF",
-        "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
-    };
+
     static constexpr std::array<std::byte, 256> ascii_to_ebcdic_table = {
         /*00*/ static_cast<std::byte>(0x00), static_cast<std::byte>(0x01), static_cast<std::byte>(0x02),
         static_cast<std::byte>(0x03), static_cast<std::byte>(0x37), static_cast<std::byte>(0x2d),
@@ -407,6 +425,7 @@ private:
         static_cast<std::byte>(0xdb), static_cast<std::byte>(0xdc), static_cast<std::byte>(0x8d),
         static_cast<std::byte>(0x8e), static_cast<std::byte>(0xdf) /*................*/
     };
+
     static constexpr std::array<std::byte, 256> ebcdic_to_ascii_table = {
         /*00*/ static_cast<std::byte>(0x00), static_cast<std::byte>(0x01), static_cast<std::byte>(0x02),
         static_cast<std::byte>(0x03), static_cast<std::byte>(0x85), static_cast<std::byte>(0x09),

@@ -157,6 +157,40 @@ auto CodeMorph::int_to_bcd(int32_t value, const std::size_t digit_count) -> std:
     return result;
 }
 
+auto CodeMorph::int_to_bcd(uint64_t value, const std::size_t digit_count) -> std::vector<std::byte> {
+    if ((digit_count & 1u) != 0u)
+        throw std::invalid_argument("int_to_bcd: num_digits must be even");
+
+    const std::size_t len = digit_count / 2;
+    std::vector<std::byte> result(len);
+
+    for (std::size_t offset = 0; offset < len; ++offset) {
+        const uint64_t digit = value % 100;
+        value /= 100;
+
+        const auto bcd = static_cast<uint8_t>((digit / 10) << 4 | digit % 10);
+        const std::size_t pos = len - 1 - offset;
+
+        result[pos] = static_cast<std::byte>(bcd);
+    }
+
+    return result;
+}
+
+auto CodeMorph::bcd_to_uint64(std::span<const std::byte> packed_bytes, const std::size_t digit_count) -> uint64_t {
+    uint64_t result = 0;
+    const std::size_t len = digit_count / 2;
+
+    for (std::size_t i = 0; i < len; ++i) {
+        const auto byte_val = static_cast<uint8_t>(packed_bytes[i]);
+        const uint64_t high = byte_val >> 4 & 0xF;
+        const uint64_t low = byte_val & 0xF;
+        result = result * 100 + high * 10 + low;
+    }
+
+    return result;
+}
+
 void CodeMorph::ascii_to_bcd(const std::string_view value, std::span<std::byte> packed_bytes, std::size_t& index,
                              const FieldPadding padding) {
     auto value_length = value.length();

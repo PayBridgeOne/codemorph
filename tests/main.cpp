@@ -82,6 +82,52 @@ TEST_CASE("bcd_to_int without index converts BCD to integer correctly", "[bcd_to
     REQUIRE(result == 1234);
 }
 
+TEST_CASE("int_to_bcd uint64_t converts small values correctly", "[int_to_bcd][uint64]") {
+    auto result = CodeMorph::int_to_bcd(uint64_t{1234}, 4);
+
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[0] == std::byte{0x12});
+    REQUIRE(result[1] == std::byte{0x34});
+}
+
+TEST_CASE("int_to_bcd uint64_t converts PAN correctly", "[int_to_bcd][uint64]") {
+    auto result = CodeMorph::int_to_bcd(uint64_t{4761739001010010}, 16);
+
+    REQUIRE(result.size() == 8);
+    REQUIRE(result[0] == std::byte{0x47});
+    REQUIRE(result[1] == std::byte{0x61});
+    REQUIRE(result[2] == std::byte{0x73});
+    REQUIRE(result[3] == std::byte{0x90});
+    REQUIRE(result[4] == std::byte{0x01});
+    REQUIRE(result[5] == std::byte{0x01});
+    REQUIRE(result[6] == std::byte{0x00});
+    REQUIRE(result[7] == std::byte{0x10});
+}
+
+TEST_CASE("int_to_bcd uint64_t pads with zeros correctly", "[int_to_bcd][uint64]") {
+    auto result = CodeMorph::int_to_bcd(uint64_t{840}, 4);
+
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[0] == std::byte{0x08});
+    REQUIRE(result[1] == std::byte{0x40});
+}
+
+TEST_CASE("bcd_to_uint64 converts BCD to uint64 correctly", "[bcd_to_uint64]") {
+    std::vector bcd = {std::byte{0x47}, std::byte{0x61}, std::byte{0x73}, std::byte{0x90},
+                       std::byte{0x01}, std::byte{0x01}, std::byte{0x00}, std::byte{0x10}};
+    uint64_t result = CodeMorph::bcd_to_uint64(bcd, 16);
+
+    REQUIRE(result == 4761739001010010ULL);
+}
+
+TEST_CASE("int_to_bcd and bcd_to_uint64 roundtrip", "[int_to_bcd][bcd_to_uint64][roundtrip]") {
+    constexpr uint64_t original = 5425233430109903ULL;
+    auto bcd = CodeMorph::int_to_bcd(original, 16);
+    uint64_t recovered = CodeMorph::bcd_to_uint64(bcd, 16);
+
+    REQUIRE(recovered == original);
+}
+
 TEST_CASE("bcd_to_ascii with index converts BCD to ASCII correctly", "[bcd_to_ascii]") {
     std::vector bcd = {std::byte{0x12}, std::byte{0x34}};
     size_t index = 0;

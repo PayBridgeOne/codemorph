@@ -2,6 +2,7 @@
 #define CODEMORPH_LIBRARY_H
 
 #include <array>
+#include <cstdint>
 #include <string>
 #include <span>
 #include <vector>
@@ -98,6 +99,25 @@ public:
      */
     [[nodiscard]] static auto int_to_bcd(int32_t value,
                            std::size_t digit_count) -> std::vector<std::byte>;
+
+    /**
+     * Converts a 64-bit unsigned integer to a vector of Binary-Coded Decimal (BCD).
+     * Supports values up to 19 digits (max uint64_t).
+     * @param value The 64-bit integer to convert.
+     * @param digit_count The number of decimal digits to encode as BCD.
+     * @return A vector of bytes representing the BCD.
+     */
+    [[nodiscard]] static auto int_to_bcd(uint64_t value,
+                           std::size_t digit_count) -> std::vector<std::byte>;
+
+    /**
+     * Converts BCD bytes to a 64-bit unsigned integer.
+     * @param packed_bytes The source span of BCD bytes to read.
+     * @param digit_count The number of decimal digits encoded in BCD to read.
+     * @return The decoded 64-bit unsigned integer value.
+     */
+    [[nodiscard]] static auto bcd_to_uint64(std::span<const std::byte> packed_bytes,
+                           std::size_t digit_count) -> uint64_t;
 
     /**
      * Converts an ASCII string of decimal digits to Binary-Coded Decimal (BCD)

@@ -279,6 +279,55 @@ public:
     [[nodiscard]] static auto ebcdic_to_ascii(std::span<const std::byte> packed_bytes,
                                 std::size_t byte_count) -> std::string;
 
+    // ========================================================================
+    // EBCDIC Numeric Conversions (for Mastercard SMS and similar protocols)
+    // ========================================================================
+
+    /**
+     * Converts an integer to EBCDIC numeric representation.
+     * Each decimal digit becomes one EBCDIC byte (F0-F9).
+     * Example: 123 with digit_count=3 -> F1 F2 F3
+     * @param value The integer to convert.
+     * @param packed_bytes The destination span to store the resulting EBCDIC bytes.
+     * @param index The current write offset in the destination span. It will be advanced.
+     * @param digit_count The number of decimal digits to encode (zero-padded on left).
+     */
+    static void int_to_ebcdic(int64_t value,
+                              std::span<std::byte> packed_bytes,
+                              std::size_t& index,
+                              std::size_t digit_count);
+
+    /**
+     * Converts an integer to EBCDIC numeric representation.
+     * @param value The integer to convert.
+     * @param digit_count The number of decimal digits to encode (zero-padded on left).
+     * @return A vector of EBCDIC bytes representing the integer.
+     */
+    [[nodiscard]] static auto int_to_ebcdic(int64_t value,
+                              std::size_t digit_count) -> std::vector<std::byte>;
+
+    /**
+     * Converts EBCDIC numeric bytes to an integer.
+     * Each EBCDIC byte (F0-F9) represents one decimal digit.
+     * Example: F1 F2 F3 -> 123
+     * @param packed_bytes The source span of EBCDIC bytes to read.
+     * @param index The current read offset in the span. It will be advanced.
+     * @param digit_count The number of EBCDIC digits to read.
+     * @return The decoded integer value.
+     */
+    [[nodiscard]] static auto ebcdic_to_int(std::span<const std::byte> packed_bytes,
+                              std::size_t& index,
+                              std::size_t digit_count) -> int64_t;
+
+    /**
+     * Converts EBCDIC numeric bytes to an integer.
+     * @param packed_bytes The source span of EBCDIC bytes to read.
+     * @param digit_count The number of EBCDIC digits to read.
+     * @return The decoded integer value.
+     */
+    [[nodiscard]] static auto ebcdic_to_int(std::span<const std::byte> packed_bytes,
+                              std::size_t digit_count) -> int64_t;
+
 private:
     static constexpr std::array<std::byte, 256> hex_lookup = {
         /* 00-0F */ std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0}, std::byte{0},

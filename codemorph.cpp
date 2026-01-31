@@ -444,3 +444,83 @@ auto CodeMorph::ebcdic_to_ascii(const std::span<const std::byte> packed_bytes,
 
     return result;
 }
+
+// ============================================================================
+// EBCDIC Numeric Conversions
+// ============================================================================
+
+void CodeMorph::int_to_ebcdic(const int64_t value,
+                              std::span<std::byte> packed_bytes,
+                              std::size_t& index,
+                              const std::size_t digit_count) {
+    // EBCDIC digits: '0' = 0xF0, '1' = 0xF1, ..., '9' = 0xF9
+    constexpr std::byte EBCDIC_ZERO{0xF0};
+    
+    // Convert to positive value for digit extraction
+    auto abs_value = static_cast<uint64_t>(value < 0 ? -value : value);
+    
+    // Extract digits in reverse order, then write left-to-right
+    std::array<std::byte, 20> digits{}; // Max 20 digits for int64
+    std::size_t digit_pos = digit_count;
+    
+    while (digit_pos > 0 && abs_value > 0) {
+        --digit_pos;
+        digits[digit_pos] = static_cast<std::byte>(
+            std::to_integer<uint8_t>(EBCDIC_ZERO) + static_cast<uint8_t>(abs_value % 10)
+        );
+        abs_value /= 10;
+    }
+    
+    // Fill remaining positions with EBCDIC '0'
+    while (digit_pos > 0) {
+        --digit_pos;
+        digits[digit_pos] = EBCDIC_ZERO;
+    }
+    
+    // Copy to output buffer
+    for (std::size_t i = 0; i < digit_count; ++i) {
+        packed_bytes[index + i] = digits[i];
+    }
+    
+    index += digit_count;
+}
+
+auto CodeMorph::int_to_ebcdic(const int64_t value,
+                              const std::size_t digit_count) -> std::vector<std::byte> {
+    std::vector<std::byte> result(digit_count);
+    std::size_t index = 0;
+    int_to_ebcdic(value, result, index, digit_count);
+    return result;
+}
+
+auto CodeMorph::ebcdic_to_int(const std::span<const std::byte> packed_bytes,
+                              std::size_t& index,
+                              const std::size_t digit_count) -> int64_t {
+    // EBCDIC digits: '0' = 0xF0, '1' = 0xF1, ..., '9' = 0xF9
+    constexpr uint8_t EBCDIC_ZERO = 0xF0;
+    constexpr uint8_t EBCDIC_NINE = 0xF9;
+    
+    int64_t result = 0;
+    
+    for (std::size_t i = 0; i < digit_count; ++i) {
+        const auto byte_val = std::to_integer<uint8_t>(packed_bytes[index + i]);
+        
+        // Validate it's an EBCDIC digit
+        if (byte_val >= EBCDIC_ZERO && byte_val <= EBCDIC_NINE) {
+            result = result * 10 + static_cast<int64_t>(byte_val - EBCDIC_ZERO);
+        } else {
+            // Not a valid EBCDIC digit - treat as 0 or throw?
+            // For robustness, treat invalid bytes as 0
+            result = result * 10;
+        }
+    }
+    
+    index += digit_count;
+    return result;
+}
+
+auto CodeMorph::ebcdic_to_int(const std::span<const std::byte> packed_bytes,
+                              const std::size_t digit_count) -> int64_t {
+    std::size_t index = 0;
+    return ebcdic_to_int(packed_bytes, index, digit_count);
+}

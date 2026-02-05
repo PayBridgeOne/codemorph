@@ -446,6 +446,35 @@ auto CodeMorph::ebcdic_to_ascii(const std::span<const std::byte> packed_bytes,
 }
 
 // ============================================================================
+// EBCDIC VISA Variant Conversions
+// ============================================================================
+
+auto CodeMorph::ebcdic_to_ascii_visa(const std::span<const std::byte> packed_bytes, std::size_t& index,
+                                const std::size_t byte_count) -> std::string {
+    std::string result(byte_count, '0');
+
+    for (std::size_t i = 0; i < byte_count; i++) {
+        const auto ebcdic_byte = std::to_integer<unsigned>(packed_bytes[index + i]);
+        result[i] = static_cast<char>(ebcdic_to_ascii_visa_table[ebcdic_byte]);
+    }
+
+    index += byte_count;
+    return result;
+}
+
+auto CodeMorph::ebcdic_to_ascii_visa(const std::span<const std::byte> packed_bytes,
+                                const std::size_t byte_count) -> std::string {
+    std::string result(byte_count, '0');
+
+    for (std::size_t i = 0; i < byte_count; i++) {
+        const auto ebcdic_byte = std::to_integer<unsigned>(packed_bytes[i]);
+        result[i] = static_cast<char>(ebcdic_to_ascii_visa_table[ebcdic_byte]);
+    }
+
+    return result;
+}
+
+// ============================================================================
 // EBCDIC Numeric Conversions
 // ============================================================================
 

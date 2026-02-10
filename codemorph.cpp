@@ -300,6 +300,30 @@ auto CodeMorph::ascii_to_ebcdic(const std::string_view value) -> std::vector<std
     return result;
 }
 
+void CodeMorph::ascii_to_ebcdic_visa(const std::string_view value, std::span<std::byte> packed_bytes, std::size_t& index)
+{
+    const auto src_length = value.length();
+
+    for (std::size_t i = 0; i < src_length; i++)
+    {
+        packed_bytes[index + i] = ascii_to_ebcdic_visa_table[static_cast<unsigned char>(value[i])];
+    }
+
+    index += src_length;
+}
+
+auto CodeMorph::ascii_to_ebcdic_visa(const std::string_view value) -> std::vector<std::byte> {
+    const auto src_length = value.length();
+    std::vector<std::byte> result(src_length);
+
+    for (std::size_t i = 0; i < src_length; i++)
+    {
+        result[i] = ascii_to_ebcdic_visa_table[static_cast<unsigned char>(value[i])];
+    }
+
+    return result;
+}
+
 auto CodeMorph::bytes_to_int(std::span<const std::byte> packed_bytes, std::size_t& index, const std::size_t byte_width) -> int32_t {
     int32_t result = 0;
     std::size_t pos = (byte_width / 2 - 1) * 8;

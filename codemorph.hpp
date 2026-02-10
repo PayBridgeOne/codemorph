@@ -176,6 +176,19 @@ public:
     [[nodiscard]] static auto ascii_to_ebcdic(std::string_view value) -> std::vector<std::byte>;
 
     /**
+     * VISA variant: converts ASCII to EBCDIC using the mapping where '^' encodes to 0x5F
+     * (Track 1 field separator). Use this when generating VISA-specific EBCDIC payloads.
+     */
+    static void ascii_to_ebcdic_visa(std::string_view value,
+                                     std::span<std::byte> packed_bytes,
+                                     std::size_t& index);
+
+    /**
+     * VISA variant: converts ASCII to a vector of EBCDIC bytes ( '^' -> 0x5F ).
+     */
+    [[nodiscard]] static auto ascii_to_ebcdic_visa(std::string_view value) -> std::vector<std::byte>;
+
+    /**
      * Converts bytes to an integer starting from a specific offset.
      * @param packed_bytes The source span of bytes to read.
      * @param index The current read offset in the span. It will be advanced.
@@ -523,6 +536,13 @@ private:
         static_cast<std::byte>(0xdb), static_cast<std::byte>(0xdc), static_cast<std::byte>(0x8d),
         static_cast<std::byte>(0x8e), static_cast<std::byte>(0xdf) /*................*/
     };
+
+    // VISA variant: identical to ascii_to_ebcdic_table except ASCII '^' (0x5E) maps to 0x5F.
+    static constexpr auto ascii_to_ebcdic_visa_table = [] {
+        std::array<std::byte, 256> table = ascii_to_ebcdic_table;
+        table[0x5E] = static_cast<std::byte>(0x5F);
+        return table;
+    }();
 
     static constexpr std::array<std::byte, 256> ebcdic_to_ascii_table = {
         /*00*/ static_cast<std::byte>(0x00), static_cast<std::byte>(0x01), static_cast<std::byte>(0x02),

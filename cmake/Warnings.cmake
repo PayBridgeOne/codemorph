@@ -1,5 +1,5 @@
-function(target_set_warnings TARGET ENABLED ENABLED_AS_ERRORS)
-    if (NOT ${ENABLED})
+function(codemorph_set_warnings TARGET ENABLED ENABLED_AS_ERRORS)
+    if(NOT ENABLED)
         message(STATUS "Warnings Disabled for: ${TARGET}")
         return()
     endif()
@@ -16,7 +16,7 @@ function(target_set_warnings TARGET ENABLED ENABLED_AS_ERRORS)
     set(GCC_WARNINGS
             ${CLANG_WARNINGS})
 
-    if(${ENABLED_AS_ERRORS})
+    if(ENABLED_AS_ERRORS)
         set(MSVC_WARNINGS ${MSVC_WARNINGS} /WX)
         set(CLANG_WARNINGS ${CLANG_WARNINGS} -Werror)
         set(GCC_WARNINGS ${GCC_WARNINGS} -Werror)
@@ -31,6 +31,6 @@ function(target_set_warnings TARGET ENABLED ENABLED_AS_ERRORS)
     endif()
 
     target_compile_options(${TARGET} PRIVATE ${WARNINGS})
-    message(STATUS ${WARNINGS})
+    message(STATUS "${TARGET} warnings: ${WARNINGS}")
 
-endfunction(target_set_warnings)
+endfunction(codemorph_set_warnings)

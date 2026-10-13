@@ -1,8 +1,10 @@
-find_package(Catch2 3 REQUIRED)
-add_executable(tests main.cpp
-        bench_codemorph.cpp)
+add_executable(codemorph_tests
+    main.cpp
+    bench_codemorph.cpp
+)
 
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain CodeMorph)
+target_link_libraries(codemorph_tests PRIVATE Catch2::Catch2WithMain codemorph::codemorph)
+codemorph_set_warnings(codemorph_tests ${CODEMORPH_ENABLE_WARNINGS} ${CODEMORPH_ENABLE_WARNINGS_AS_ERRORS})
 
 include(Catch)
-catch_discover_tests(tests) 
+catch_discover_tests(codemorph_tests)

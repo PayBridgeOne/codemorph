@@ -1,7 +1,11 @@
-# Cambios Implementados en CodeMorph
+# Cambios Implementados en codemorph
+
+> Registro histórico de mejoras anteriores a v2.0.0. Las métricas y afirmaciones de compatibilidad corresponden
+> a ese trabajo. Para la API actual y los cambios incompatibles, consulta [MIGRATION.md](MIGRATION.md).
 
 ## Resumen
-Se implementaron mejoras críticas de desempeño y modernización de C++23 en la librería CodeMorph. Todos los tests pasan exitosamente.
+Se implementaron mejoras críticas de desempeño y modernización de C++23 en la librería codemorph. Todos los tests pasan
+exitosamente.
 
 ---
 
@@ -12,7 +16,7 @@ Se implementaron mejoras críticas de desempeño y modernización de C++23 en la
 
 Se agregó `[[nodiscard]]` a todas las funciones que retornan valores:
 - `hex_to_bytes()`
-- `bytes_to_hex()` 
+- `bytes_to_hex()`
 - `int_to_bytes()`
 - `int_to_bcd()`
 - `ascii_to_bcd()`
@@ -24,7 +28,8 @@ Se agregó `[[nodiscard]]` a todas las funciones que retornan valores:
 - `bytes_to_ascii()`
 - `ebcdic_to_ascii()`
 
-**Beneficio:** El compilador ahora genera warnings si se ignora el resultado de estas funciones, previniendo errores sutiles.
+**Beneficio:** El compilador ahora genera warnings si se ignora el resultado de estas funciones, previniendo errores
+sutiles.
 
 ---
 
@@ -33,7 +38,7 @@ Se agregó `[[nodiscard]]` a todas las funciones que retornan valores:
 
 #### Antes (❌ Bug):
 ```cpp
-auto CodeMorph::ascii_to_bytes(const std::string_view str_ascii_string) -> std::vector<std::byte> {
+auto codemorph::ascii_to_bytes(const std::string_view str_ascii_string) -> std::vector<std::byte> {
     const size_t len = str_ascii_string.length();
     std::vector<std::byte> result(len);  // ← Crea vector con tamaño 'len'
     for (char c: str_ascii_string) {
@@ -42,11 +47,12 @@ auto CodeMorph::ascii_to_bytes(const std::string_view str_ascii_string) -> std::
     return result;
 }
 ```
-**Problema:** El vector se crea con tamaño `len`, luego `emplace_back()` añade `len` elementos adicionales, resultando en tamaño `2*len` y posibles realocaciones.
+**Problema:** El vector se crea con tamaño `len`, luego `emplace_back()` añade `len` elementos adicionales, resultando
+en tamaño `2*len` y posibles realocaciones.
 
 #### Después (✅ Optimizado):
 ```cpp
-auto CodeMorph::ascii_to_bytes(std::string_view str_ascii_string) -> std::vector<std::byte> {
+auto codemorph::ascii_to_bytes(std::string_view str_ascii_string) -> std::vector<std::byte> {
     const std::size_t len = str_ascii_string.length();
     std::vector<std::byte> result(len);
 
@@ -69,7 +75,7 @@ auto CodeMorph::ascii_to_bytes(std::string_view str_ascii_string) -> std::vector
 
 #### Antes (❌ Ineficiente):
 ```cpp
-auto CodeMorph::ascii_to_ebcdic(const std::string_view value) -> std::vector<std::byte> {
+auto codemorph::ascii_to_ebcdic(const std::string_view value) -> std::vector<std::byte> {
     const auto src_length = value.length();
     std::vector<std::byte> result;
     result.reserve(src_length);  // ← Solo reserva capacidad
@@ -82,7 +88,7 @@ auto CodeMorph::ascii_to_ebcdic(const std::string_view value) -> std::vector<std
 
 #### Después (✅ Optimizado):
 ```cpp
-auto CodeMorph::ascii_to_ebcdic(std::string_view value) -> std::vector<std::byte> {
+auto codemorph::ascii_to_ebcdic(std::string_view value) -> std::vector<std::byte> {
     const auto src_length = value.length();
     std::vector<std::byte> result(src_length);  // ← Crea con tamaño
 
@@ -126,7 +132,7 @@ Se reemplazaron todos los usos inconsistentes de tipos:
 for (uint32_t i = 0; i < len; i++) { ... }
 auto bytes_to_int(...) -> int { ... }
 
-// Después  
+// Después
 for (std::size_t i = 0; i < len; ++i) { ... }
 auto bytes_to_int(...) -> int32_t { ... }
 ```
@@ -143,13 +149,13 @@ auto bytes_to_int(...) -> int32_t { ... }
 #### Antes (❌ Duplicación masiva):
 ```cpp
 // Versión con index: 60 líneas de código
-auto CodeMorph::bcd_to_ascii(std::span<const std::byte> packed_bytes, 
+auto codemorph::bcd_to_ascii(std::span<const std::byte> packed_bytes,
                              std::size_t& index, ...) -> std::string {
     // ... 60 líneas de lógica compleja
 }
 
 // Versión sin index: 60 líneas IDÉNTICAS
-auto CodeMorph::bcd_to_ascii(std::span<const std::byte> packed_bytes, 
+auto codemorph::bcd_to_ascii(std::span<const std::byte> packed_bytes,
                              FieldPadding padding, ...) -> std::string {
     // ... 60 líneas duplicadas
 }
@@ -157,7 +163,7 @@ auto CodeMorph::bcd_to_ascii(std::span<const std::byte> packed_bytes,
 
 #### Después (✅ DRY - Don't Repeat Yourself):
 ```cpp
-auto CodeMorph::bcd_to_ascii(std::span<const std::byte> packed_bytes, 
+auto codemorph::bcd_to_ascii(std::span<const std::byte> packed_bytes,
                              FieldPadding padding,
                              std::size_t digit_count) -> std::string {
     std::size_t index = 0;
@@ -300,11 +306,7 @@ result[i] = static_cast<char>(ebcdic_to_ascii_table[ebcdic_byte]);
    - Mejor para contextos de procesamiento de mensajes ISO8583
 
 3. **Namespace**
-   ```cpp
-   namespace codemorph {
-       class CodeMorph { ... };
-   }
-   ```
+   Implementado en v2.0.0 mediante funciones libres en `codemorph::`; consulta `MIGRATION.md`.
 
 ### Prioridad BAJA (optimizaciones avanzadas)
 4. **SIMD explícito para bytes_to_hex**
@@ -324,8 +326,8 @@ Las mejoras implementadas han resuelto:
 - ✅ **60+ líneas de código duplicado**
 - ✅ **12 funciones ahora con [[nodiscard]]** para prevención de errores
 
-**Ganancia estimada de desempeño:** 15-30% en operaciones críticas  
-**Reducción de líneas de código:** ~60 líneas  
+**Ganancia estimada de desempeño:** 15-30% en operaciones críticas
+**Reducción de líneas de código:** ~60 líneas
 **Tests pasando:** 19/19 (100%) ✅
 
 La librería ahora está lista para uso en producción con mejor desempeño, más segura y más mantenible.

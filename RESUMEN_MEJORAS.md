@@ -1,4 +1,7 @@
-# ✅ Resumen de Mejoras Implementadas en CodeMorph
+# ✅ Resumen de Mejoras Implementadas en codemorph
+
+> Registro histórico de mejoras anteriores a v2.0.0. Las métricas y afirmaciones de compatibilidad corresponden
+> a ese trabajo. Para la API actual y los cambios incompatibles, consulta [MIGRATION.md](MIGRATION.md).
 
 ## 📊 Estadísticas de Cambios
 
@@ -115,7 +118,7 @@ Todas las mejoras son internas de implementación:
 - [ ] Manejo de errores con `std::expected<T, E>` (C++23)
 
 ### Prioridad MEDIA
-- [ ] Namespace `codemorph::`
+- [x] Namespace `codemorph::` (v2.0.0)
 - [ ] `constexpr` donde sea posible
 
 ### Prioridad BAJA
@@ -145,7 +148,7 @@ Todas las mejoras son internas de implementación:
 6. **+15-30% desempeño** en operaciones críticas
 
 ### 🚀 Estado Actual
-La librería CodeMorph ahora está:
+La librería codemorph ahora está:
 - ✅ **Más rápida**: Bugs de desempeño corregidos
 - ✅ **Más segura**: `[[nodiscard]]` previene errores
 - ✅ **Más mantenible**: Sin código duplicado

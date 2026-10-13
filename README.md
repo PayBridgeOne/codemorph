@@ -1,5 +1,7 @@
 # codemorph
 
+[![CI](https://github.com/PayBridgeOne/codemorph/actions/workflows/ci.yml/badge.svg)](https://github.com/PayBridgeOne/codemorph/actions/workflows/ci.yml)
+
 C++23 encoding utilities for hexadecimal, byte buffers, ASCII, BCD and EBCDIC, including VISA's EBCDIC variant.
 
 ## Usage
@@ -53,5 +55,3 @@ so `find_package(codemorph CONFIG)` resolves the target. A package version confi
 ## Migration and historical notes
 
 See [MIGRATION.md](MIGRATION.md) for the breaking changes from v1.1.1 to v2.0.0.
-The earlier improvement reports and `MEJORAS_SUGERIDAS.md` describe previous work. The `.backup` files are historical
-snapshots and are not compiled or installed.
